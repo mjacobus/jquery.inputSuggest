@@ -36,12 +36,13 @@
             },
             /**
              * Handles item click
-             * @param clicked li element being clicked
+             * @param selected li element being clicked
              * @param input the typing input
              * @param list the list to append the items
              */
-            onClick: function (clicked,input,list) {
-                input.val(clicked.attr('title'));
+            onSelect: function (selected,input,list) {
+                input.val(selected.attr('title'));
+                selected.removeClass('active');
                 list.hide();
             },
             /**
@@ -72,11 +73,11 @@
                         }
                     }).each(function(){
                         if ($(this).hasClass('active')) {
-                            input.val($(this).attr('title'));
+                            settings.onSelect($(this),input,list);
                             valid = true;
                             return;
                         }
-                    });
+                    }).removeClass('active');
                 }
                 if (this.stickToTheList && !valid) {
                     input.val('');
@@ -152,9 +153,8 @@
                     },
                     success: function(suggestions){
                         settings.handleSuggestions(suggestions,$list,$input);
-
                         $list.children('li').click(function(){
-                            settings.onClick($(this),$input,$list);
+                            settings.onSelect($(this),$input,$list);
                         }).hover(function(){
                             settings.onMouseOver($(this),$input,$list);
                         });
