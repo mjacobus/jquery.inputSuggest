@@ -6,7 +6,7 @@
             method: 'POST',
             cache: false,
             async: false,
-            styckToTheList: true,
+            stickToTheList: true,
             minChars: 3,
             /**
              * Handles the suggetstions
@@ -78,7 +78,7 @@
                         }
                     });
                 }
-                if (this.styckToTheList && !valid) {
+                if (this.stickToTheList && !valid) {
                     input.val('');
                 }
             }
