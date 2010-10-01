@@ -17,7 +17,9 @@
             handleSuggestions: function(suggestions,list,input) {
                 list.html('');
                 for(var i=0; i < suggestions.length; i++) {
-                    var item = settings.getItem(suggestions[i],input);
+                    this.preGetItem(suggestions[i],input,list);
+                    var item = this.getItem(suggestions[i],input,list);
+                    item = this.beforeAppend(item,suggestions[i],input,list);
                     list.append(item);
                 }
             },
@@ -26,16 +28,38 @@
              * @param   suggestion is the array element containing the object
              *          with the necessary information to create the item
              * @param   input where the suggestion is acting on
+             * @param   list the list
              *
              */
-            getItem : function(suggestion, input) {
-                var value = suggestion.value;
-                var bolded = value.replace(input.val(),'<strong>' + input.val() + '</strong>')
-                var li = $('<li title="'+value+'">'+bolded+'</li>');
-                return li;
+            getItem : function(suggestion,input,list) {
+                return $('<li></li>');
             },
             /**
-             * Handles item click
+             * Execute after getting item
+             * @param   item just created li element
+             * @param   suggestion the response element
+             * @param   input the input
+             * @param   list the list
+             */
+            beforeAppend : function(item, suggestion, input,list) {
+                var value = suggestion.value;
+                var bolded = value.replace(input.val(),'<strong>' + input.val() + '</strong>')
+                item.attr('title',value).html(bolded);
+                return item;
+            },
+            /**
+             * Execute before getting item
+             * @param   item is the array element containing the object
+             *          with the necessary information to create the item
+             * @param   input where the suggestion is acting on
+             * @param   list the list
+             *
+             */
+            preGetItem : function(item, input,list) {
+                
+            },
+            /**
+             * Handles item select
              * @param selected li element being clicked
              * @param input the typing input
              * @param list the list to append the items
@@ -44,6 +68,24 @@
                 input.val(selected.attr('title'));
                 selected.removeClass('active');
                 list.hide();
+            },
+            /**
+             * Pre select
+             * @param selected li element being clicked
+             * @param input the typing input
+             * @param list the list to append the items
+             */
+            preSelect: function (selected,input,list) {
+                
+            },
+            /**
+             * Pre select
+             * @param selected li element being clicked
+             * @param input the typing input
+             * @param list the list to append the items
+             */
+            postSelect: function (selected,input,list) {
+                
             },
             /**
              * Handles item mouse over
@@ -73,7 +115,9 @@
                         }
                     }).each(function(){
                         if ($(this).hasClass('active')) {
+                            settings.preSelect($(this),input,list);
                             settings.onSelect($(this),input,list);
+                            settings.postSelect($(this),input,list);
                             valid = true;
                             return;
                         }
