@@ -19,7 +19,8 @@
                 for(var i=0; i < suggestions.length; i++) {
                     this.preGetItem(suggestions[i],input,list);
                     var item = this.getItem(suggestions[i],input,list);
-                    item = this.beforeAppend(item,suggestions[i],input,list);
+                    item = this.defaultPreAppend(item,suggestions[i],input,list);
+                    item = this.preAppend(item,suggestions[i],input,list);
                     list.append(item);
                 }
             },
@@ -41,10 +42,27 @@
              * @param   input the input
              * @param   list the list
              */
-            beforeAppend : function(item, suggestion, input,list) {
+            defaultPreAppend : function(item, suggestion, input,list) {
                 var value = suggestion.value;
-                var bolded = value.replace(input.val(),'<strong>' + input.val() + '</strong>')
+                var regexp = new RegExp(input.val(),'i');
+                var matches = value.match(regexp);
+                var bolded;
+                if (matches !== null){
+                    bolded = value.replace(regexp,'<strong>' + matches[0] + '</strong>')
+                } else {
+                    bolded = '???error???';
+                }
                 item.attr('title',value).html(bolded);
+                return item;
+            },
+            /**
+             * Execute after getting item
+             * @param   item just created li element
+             * @param   suggestion the response element
+             * @param   input the input
+             * @param   list the list
+             */
+            preAppend : function(item, suggestion, input,list) {
                 return item;
             },
             /**
