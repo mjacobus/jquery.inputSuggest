@@ -8,6 +8,7 @@
             async: false,
             stickToTheList: true,
             minChars: 3,
+            suggestionField: 'value',
             /**
              * Handles the suggetstions
              * @param suggestions the ajax response. A json object
@@ -43,7 +44,7 @@
              * @param   list the list
              */
             defaultPreAppend : function(item, suggestion, input,list) {
-                var value = suggestion.value;
+                var value = suggestion[this.suggestionField];
                 var regexp = new RegExp(input.val(),'i');
                 var matches = value.match(regexp);
                 var bolded;
