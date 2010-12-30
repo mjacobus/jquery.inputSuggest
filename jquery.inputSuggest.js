@@ -117,6 +117,15 @@
                 overed.addClass('active');
             },
             /**
+             * Handles the clearing of aditional elements when 
+             * stickToTheList is true
+             * @param input the typing input
+             * @param list the list to append the items
+             */
+            onClear : function(input, list){
+                input.val('');
+            },
+            /**
              * Handles input blur
              * @param input the imput the suggestion is actin on
              */
@@ -143,7 +152,7 @@
                     }).removeClass('active');
                 }
                 if (this.stickToTheList && !valid) {
-                    input.val('');
+                    settings.onClear(input,list);
                 }
             }
         };
