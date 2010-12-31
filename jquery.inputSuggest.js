@@ -45,7 +45,13 @@
              */
             defaultPreAppend : function(item, suggestion, input,list) {
                 var value = suggestion[this.suggestionField];
-                var regexp = new RegExp(input.val(),'i');
+                var regexpString = input.val()
+                        .replace('a','(a|á|ã|à|ä|â)')
+                        .replace('e','(e|é|ë|ẽ|è|ê)')
+                        .replace('i','(i|í|ï|ĩ|ì|î)')
+                        .replace('o','(o|ö|ó|õ|ò|ô)')
+                        .replace('u','(u|ü|ú|ũ|ù|û)');
+                var regexp = new RegExp(regexpString,'i');
                 var matches = value.match(regexp);
                 var bolded;
                 if (matches !== null){
