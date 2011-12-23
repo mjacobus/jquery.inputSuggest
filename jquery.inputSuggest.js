@@ -10,6 +10,9 @@
             minChars: 3,
             suggestionField: 'value',
             paramName: 'hint',
+            /**
+             * @param hint
+             */
             getSuggestions: function(hint){
                 return false;
             },
@@ -20,12 +23,8 @@
              * @param input the typing input
              */
             handleSuggestions: function(suggestions,list,input) {
-                if(typeof(suggestions) == 'string') {
-                    suggestions = this.eval(suggestions)
-                }
                 list.html('');
-                for(var i=0; i < suggestions.length; i++) {
-                    this.preGetItem(suggestions[i],input,list);
+                for(var i in suggestions) {
                     var item = this.getItem(suggestions[i],input,list);
                     item = this.defaultPreAppend(item,suggestions[i],input,list);
                     item = this.preAppend(item,suggestions[i],input,list);
@@ -36,7 +35,9 @@
              * @param suggestions
              */
             eval: function(suggestions){
-                suggestions = eval('(' + suggestions + ')');
+                if(typeof(suggestions) === 'string'){
+                    suggestions = eval('(' + suggestions + ')');
+                }
                 return suggestions; 
             },
             /**
@@ -67,6 +68,7 @@
             defaultPreAppend : function(item, suggestion, input,list) {
                 var value = this.getValue(suggestion);
                 var regexpString = input.val()
+                .replace('c','(c|ç)')
                 .replace('a','(a|á|ã|à|ä|â)')
                 .replace('e','(e|é|ë|ẽ|è|ê)')
                 .replace('i','(i|í|ï|ĩ|ì|î)')
@@ -97,17 +99,7 @@
             preAppend : function(item, suggestion, input,list) {
                 return item;
             },
-            /**
-             * Execute before getting item
-             * @param   item is the array element containing the object
-             *          with the necessary information to create the item
-             * @param   input where the suggestion is acting on
-             * @param   list the list
-             *
-             */
-            preGetItem : function(item, input,list) {
-                
-            },
+           
             /**
              * Handles item select
              * @param selected li element being clicked
@@ -118,7 +110,6 @@
                 input.val(selected.attr('title'));
                 selected.removeClass('active');
                 list.hide();
-                this.postSelect(selected,input,list);
             },
             /**
              * Pre select
@@ -157,13 +148,16 @@
             onClear : function(input, list){
                 input.val('');
             },
+            getListId: function (input){
+                return (input.attr('name') + '_suggest').replace(/[\[\]]/g,'_');
+            },
             /**
              * Handles input blur
              * @param input the imput the suggestion is actin on
              */
             onBlur: function(input) {
                 var value = input.val();
-                var list = $('#' + input.attr('id') + '-suggest' )
+                var list = $('#' + this.getListId(input));
                 var valid = false;
                 list.hide();
 
@@ -197,68 +191,69 @@
 
             $(this).attr('autocomplete','off');
             $(this).keyup(function(e){
-
-                var url = settings.url;
-                var inputName = $(this).attr('name');
-                var listId = (inputName + '_suggest').replace(/[\[\]]/g,'_');
+                var listId = settings.getListId($(this));
                 var listSelector = '#' + listId;
-                var $input = $(this);
-                var value = $input.val();
+                var input = $(this);
+                var value = input.val();
 
                 /**
                  * Navigation keys
                  * keys: arrow up, arrow down
                  */
                 if(e.keyCode == 38 || e.keyCode ==40) {
-                    var $current = $(listSelector + ' li.active');
-                    if ($current.length == 0) {
+                    var current = $(listSelector + ' li.active');
+                    if (current.length === 0) {
                         $(listSelector + ' li:first').addClass('active');
-                        return;
                     }
                     if (e.keyCode == 38) { //up key
-                        var $prev = $current.prev('li');
-                        if($prev.length === 1) {
+                        var prev = current.prev('li');
+                        if(prev.length === 1) {
                             $(listSelector + ' li').removeClass('active');
-                            $prev.addClass('active');
+                            prev.addClass('active');
                         }
                     } else if (e.keyCode == 40) { //down key
-                        var $next = $current.next('li');
-                        if($next.length === 1) {
+                        var next = current.next('li');
+                        if(next.length === 1) {
                             $(listSelector + ' li').removeClass('active');
-                            $next.addClass('active');
+                            next.addClass('active');
                         }
                     }
                     return
                 } // navigation keys
 
 
-                if (value.length < settings.minChars || $input.attr('lastval') == value) {
-                    $input.attr('lastval',value);
+                if (value.length < settings.minChars || input.attr('lastval') == value) {
+                    input.attr('lastval',value);
                     return;
                 }
 
-                if ($(listSelector).length == 0) {
+                if ($(listSelector).length === 0) {
                     $('<ul id="' + listId + '" class="suggest"></ul>').appendTo($(this).parent());
                 }
 
-                var $list = $(listSelector);
-                $list.html('').show().css({
+                var list = $(listSelector);
+                list.html('').show().css({
                     width: $(this).width(),
                     'margin-left': $(this).css('margin-left')
                 });
 
                 var handler = function(suggestions){
-                    settings.handleSuggestions(suggestions,$list,$input);
-                    $list.children('li').click(function(){
-                        settings.onSelect($(this),$input,$list);
+                    if(typeof(suggestions) == 'string') {
+                        suggestions = settings.eval(suggestions)
+                    }
+                    settings.handleSuggestions(suggestions,list,input);
+                    list.children('li').click(function(){
+                        settings.onSelect($(this),input,list);
+                        settings.postSelect($(this),input,list);
                     }).hover(function(){
-                        settings.onMouseOver($(this),$input,$list);
+                        settings.onMouseOver($(this),input,list);
                     });
                 }
                 
                 var suggested = settings.getSuggestions(value);
                 
                 if(suggested === false) {
+                    var url = settings.url;
                     var data = {};
                     data[settings.paramName] = value;
                     $.ajax({
