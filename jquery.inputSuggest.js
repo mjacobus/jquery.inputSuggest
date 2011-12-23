@@ -9,6 +9,10 @@
             stickToTheList: true,
             minChars: 3,
             suggestionField: 'value',
+            paramName: 'hint',
+            getSuggestions: function(hint){
+                return false;
+            },
             /**
              * Handles the suggetstions
              * @param suggestions the ajax response. A json object
@@ -16,6 +20,9 @@
              * @param input the typing input
              */
             handleSuggestions: function(suggestions,list,input) {
+                if(typeof(suggestions) == 'string') {
+                    suggestions = this.eval(suggestions)
+                }
                 list.html('');
                 for(var i=0; i < suggestions.length; i++) {
                     this.preGetItem(suggestions[i],input,list);
@@ -26,6 +33,13 @@
                 }
             },
             /**
+             * @param suggestions
+             */
+            eval: function(suggestions){
+                suggestions = eval('(' + suggestions + ')');
+                return suggestions; 
+            },
+            /**
              * Creates and returns an item based on one item of the response
              * @param   suggestion is the array element containing the object
              *          with the necessary information to create the item
@@ -34,7 +48,14 @@
              *
              */
             getItem : function(suggestion,input,list) {
-                return $('<li></li>');
+                return $('<li></li>').attr('suggestion',suggestion.toSource());
+            },
+            /**
+             * Gets the orinal suggestion
+             * @param item
+             */
+            getSuggestion: function(item){
+                return this.eval(item.attr('suggestion'));
             },
             /**
              * Execute after getting item
@@ -44,23 +65,27 @@
              * @param   list the list
              */
             defaultPreAppend : function(item, suggestion, input,list) {
-                var value = suggestion[this.suggestionField];
+                var value = this.getValue(suggestion);
                 var regexpString = input.val()
-                        .replace('a','(a|á|ã|à|ä|â)')
-                        .replace('e','(e|é|ë|ẽ|è|ê)')
-                        .replace('i','(i|í|ï|ĩ|ì|î)')
-                        .replace('o','(o|ö|ó|õ|ò|ô)')
-                        .replace('u','(u|ü|ú|ũ|ù|û)');
+                .replace('a','(a|á|ã|à|ä|â)')
+                .replace('e','(e|é|ë|ẽ|è|ê)')
+                .replace('i','(i|í|ï|ĩ|ì|î)')
+                .replace('o','(o|ö|ó|õ|ò|ô)')
+                .replace('u','(u|ü|ú|ũ|ù|û)');
                 var regexp = new RegExp(regexpString,'i');
                 var matches = value.match(regexp);
                 var bolded;
                 if (matches !== null){
-                    bolded = value.replace(regexp,'<strong>' + matches[0] + '</strong>')
+                    bolded = value.replace(regexp,'<strong>' + matches[0] + '</strong>');
+                    item.attr('title',value).html(bolded);
                 } else {
-                    bolded = '???error???';
+                    item.attr('title',value).html(value);
                 }
-                item.attr('title',value).html(bolded);
+                
                 return item;
+            },
+            getValue: function(suggestion){
+                return suggestion[this.suggestionField];
             },
             /**
              * Execute after getting item
@@ -93,6 +118,7 @@
                 input.val(selected.attr('title'));
                 selected.removeClass('active');
                 list.hide();
+                this.postSelect(selected,input,list);
             },
             /**
              * Pre select
@@ -174,7 +200,7 @@
 
                 var url = settings.url;
                 var inputName = $(this).attr('name');
-                var listId = inputName + '-suggest';
+                var listId = (inputName + '_suggest').replace(/[\[\]]/g,'_');
                 var listSelector = '#' + listId;
                 var $input = $(this);
                 var value = $input.val();
@@ -221,23 +247,33 @@
                     'margin-left': $(this).css('margin-left')
                 });
 
-                $.ajax({
-                    url: url,
-                    type: settings.method,
-                    cache: settings.cache,
-                    asyc: settings.async,
-                    data: {
-                        hint:value
-                    },
-                    success: function(suggestions){
-                        settings.handleSuggestions(suggestions,$list,$input);
-                        $list.children('li').click(function(){
-                            settings.onSelect($(this),$input,$list);
-                        }).hover(function(){
-                            settings.onMouseOver($(this),$input,$list);
-                        });
-                    }
-                });
+                var handler = function(suggestions){
+                    settings.handleSuggestions(suggestions,$list,$input);
+                    $list.children('li').click(function(){
+                        settings.onSelect($(this),$input,$list);
+                    }).hover(function(){
+                        settings.onMouseOver($(this),$input,$list);
+                    });
+                }
+                
+                var suggested = settings.getSuggestions(value);
+                
+                if(suggested === false) {
+                    var data = {};
+                    data[settings.paramName] = value;
+                    $.ajax({
+                        url: url,
+                        type: settings.method,
+                        cache: settings.cache,
+                        asyc: settings.async,
+                        data: data,
+                        success: handler
+                    });
+                } else {
+                    handler(suggested);
+                }
+                 
+                
             });
 
             $(this).blur(function() {

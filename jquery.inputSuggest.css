@@ -1,0 +1,48 @@
+/**
+ * Jquery Input Suggest
+ * @author Marcelo Jacobus <marcelo.jacobus@gmail.com>
+ */
+ul.suggest {
+    position:absolute;
+    padding:0;
+    border: 1px #eee solid;
+    background: white;
+    overflow: hidden;
+}
+
+ul.suggest li {
+    width: 100%;
+    text-align: left;
+    margin-left: 5px;
+    color:gray;
+}
+
+ul.suggest li.active {
+    background: #ddd;
+    color:black;
+}
+
+/**
+* Target lists
+*/
+
+ul.targets {
+    width: 600px;
+    padding:0;
+    margin:0;
+}
+ul.targets li {
+    background:none repeat scroll 0 0 white;
+    margin:4px 0 0 13px;
+    padding:0 5px;
+    width:590px;
+}
+
+ul.targets li a.del {
+    float: right;
+    color: red;
+}
+
+ul.targets li.odd {
+    
+}

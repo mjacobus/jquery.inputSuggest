@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+  <title>jQuery.inputSuggest</title>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" charset="UTF-8" ></script>
+  <link href="../jquery.inputSuggest.css" media="screen" rel="stylesheet" type="text/css" />
+  <script src="../jquery.inputSuggest.js" type="text/javascript"></script>
+</head>
+<body>
+<h1>jQuery.inputSuggest</h1>
+<form accept-charset="UTF-8" action="/clientes/2" class="edit_cliente" id="edit_cliente_2" method="post"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /><input name="_method" type="hidden" value="put" /><input name="authenticity_token" type="hidden" value="ILMrX4ROibEKMK5R0BoVWgZ1zRjoz5qYsnFkdNqS1aI=" /></div>
+	
+	
+  <div class="field">
+    <label for="example_one">Example 1</label><br />
+    <input id="example_one" name="example[one]" size="30" type="text" value="" />
+  </div>
+  <script type="text/javascript">
+  $(document).ready(function(){
+  	$('#example_one').inputSuggest({
+  		url: 'suggestions.txt',
+	  		method: 'GET',
+	  		getSuggestions: function (hint){
+	  			return [
+					{id:"1", value: "Acre"},
+				    {id:"2", value: "Alagoas"},
+				    {id:"3", value: "Amapá"},
+				    {id:"4", value: "Amazonas"},
+				    {id:"5", value: "Bahia"},
+				    {id:"6", value: "Ceará"},
+				    {id:"7", value: "Distrito Federal"},
+				    {id:"8", value: "Espírito Santo"},
+				    {id:"9", value: "Goiás"},
+				    {id:"10", value: "Maranhão"},
+				    {id:"11", value: "Mato Grosso"},
+				    {id:"12", value: "Mato Grosso do Sul"},
+				    {id:"13", value: "Minas Gerais"},
+				    {id:"14", value: "Pará"},
+				    {id:"15", value: "Paraíba"},
+				    {id:"16", value: "Paraná"},
+				    {id:"17", value: "Pernambuco"},
+				    {id:"18", value: "Piauí"},
+				    {id:"19", value: "Rio Grande do Norte"},
+				    {id:"20", value: "Rio Grande do Sul"},
+				    {id:"21", value: "Rio de Janeiro"},
+				    {id:"22", value: "Rondônia"},
+				    {id:"23", value: "Roraima"},
+				    {id:"24", value: "Santa Catarina"},
+				    {id:"25", value: "São Paulo"},
+				    {id:"26", value: "Sergipe"},
+				    {id:"27", value: "Tocantins"}
+				];
+	  		}
+  	});
+  });
+  </script>
+  
+  <div class="field">
+    <label for="example_two">Example 2</label><br />
+    <input id="example_two" name="example[two]" size="30" type="text" value="" />
+    <script type="text/javascript">
+	  $(document).ready(function(){
+	  	$('#example_two').inputSuggest({
+	  		url: 'suggestions.txt',
+	  		method: 'GET'
+	  	});
+	  });
+	  </script>
+  </div>
+    
+  
+  
+</form>
+
+</body>
+</html>
