@@ -1,6 +1,5 @@
 (function( $ ){
     $.fn.inputSuggest = function(options) {
-
         var settings = {
             url: window.location.href,
             method: 'POST',
@@ -81,14 +80,12 @@
                 .replace('u','(u|ü|ú|ũ|ù|û)');
                 var regexp = new RegExp(regexpString,'i');
                 var matches = value.match(regexp);
-                var bolded;
                 if (matches !== null){
-                    bolded = value.replace(regexp,'<strong>' + matches[0] + '</strong>');
+                    var bolded = value.replace(regexp,'<strong>' + matches[0] + '</strong>');
                     item.attr('title',value).html(bolded);
                 } else {
                     item.attr('title',value).html(value);
                 }
-                
                 return item;
             },
             getValue: function(suggestion){
@@ -104,7 +101,6 @@
             preAppend : function(item, suggestion, input,list) {
                 return item;
             },
-           
             /**
              * Handles item select
              * @param selected li element being clicked
@@ -122,18 +118,14 @@
              * @param input the typing input
              * @param list the list to append the items
              */
-            preSelect: function (selected,input,list) {
-                
-            },
+            preSelect: function (selected,input,list) {},
             /**
              * Pre select
              * @param selected li element being clicked
              * @param input the typing input
              * @param list the list to append the items
              */
-            postSelect: function (selected,input,list) {
-                
-            },
+            postSelect: function (selected,input,list) {},
             /**
              * Handles item mouse over
              * @param overed li element being clicked
@@ -193,14 +185,12 @@
         }
 
         this.each(function(){
-
             $(this).attr('autocomplete','off');
             $(this).keyup(function(e){
                 var listId = settings.getListId($(this));
                 var listSelector = '#' + listId;
                 var input = $(this);
                 var value = input.val();
-
                 /**
                  * Navigation keys
                  * keys: arrow up, arrow down
@@ -209,6 +199,7 @@
                     var current = $(listSelector + ' li.active');
                     if (current.length === 0) {
                         $(listSelector + ' li:first').addClass('active');
+                        return;
                     }
                     if (e.keyCode == 38) { //up key
                         var prev = current.prev('li');
@@ -226,7 +217,7 @@
                     return
                 } // navigation keys
 
-
+                // i don't remember what that does
                 if (value.length < settings.minChars || input.attr('lastval') == value) {
                     input.attr('lastval',value);
                     return;
@@ -279,8 +270,6 @@
             $(this).blur(function() {
                 settings.onBlur($(this));
             });
-
-            
         });//this.each
     }
 })(jQuery)
