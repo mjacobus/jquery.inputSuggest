@@ -49,7 +49,12 @@
              *
              */
             getItem : function(suggestion,input,list) {
-                return $('<li></li>').attr('suggestion',suggestion.toSource());
+                var li = $('<li></li>');
+                var s=[];
+                for(var i in suggestion){
+                    s.push(['"',i,'":"',(suggestion[i]+"").replace(/"/g,'\\"'),'"'].join(''));
+                }
+                return li.attr('suggestion','({'+s.join(',')+'})');
             },
             /**
              * Gets the orinal suggestion
