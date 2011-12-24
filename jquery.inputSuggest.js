@@ -63,6 +63,21 @@
                 return this.eval(item.attr('suggestion'));
             },
             /**
+             * Get the regexp matcher for matching the hint
+             * getMatcher("cão") => /(c|ç)(a|á|ã|à|ä|â)(o|ö|ó|õ|ò|ô)/i
+             * @param string
+             */
+            getMatcher: function(string){
+                var regexpString = string.replace('c','(c|ç)')
+                .replace(/\s/g,'\\s')
+                .replace('a','(a|á|ã|à|ä|â)')
+                .replace('e','(e|é|ë|ẽ|è|ê)')
+                .replace('i','(i|í|ï|ĩ|ì|î)')
+                .replace('o','(o|ö|ó|õ|ò|ô)')
+                .replace('u','(u|ü|ú|ũ|ù|û)');
+                return new RegExp(regexpString,'i');
+            },
+            /**
              * Execute after getting item
              * @param   item just created li element
              * @param   suggestion the response element
@@ -71,14 +86,7 @@
              */
             defaultPreAppend : function(item, suggestion, input,list) {
                 var value = this.getValue(suggestion);
-                var regexpString = input.val()
-                .replace('c','(c|ç)')
-                .replace('a','(a|á|ã|à|ä|â)')
-                .replace('e','(e|é|ë|ẽ|è|ê)')
-                .replace('i','(i|í|ï|ĩ|ì|î)')
-                .replace('o','(o|ö|ó|õ|ò|ô)')
-                .replace('u','(u|ü|ú|ũ|ù|û)');
-                var regexp = new RegExp(regexpString,'i');
+                var regexp = this.getMatcher(input.val());
                 var matches = value.match(regexp);
                 if (matches !== null){
                     var bolded = value.replace(regexp,'<strong>' + matches[0] + '</strong>');
