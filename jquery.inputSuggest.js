@@ -177,7 +177,22 @@
                 if (this.stickToTheList && !valid) {
                     settings.onClear(input,list);
                 }
-            }
+            },
+            /**
+             * What should be done after the escape key is pressed?
+             * @param input the input
+             * @param list the list
+             */
+            onEscape: function(input,list){
+                input.val('');
+                list.remove();
+            },
+            /**
+             * What should be done after the onEscape method
+             * @param input the input
+             * @param list the list
+             */
+            onAfterEscape: function(input,list){}
         };
 
         if (options) {
@@ -191,11 +206,17 @@
                 var listSelector = '#' + listId;
                 var input = $(this);
                 var value = input.val();
+                var list = $(listSelector);
                 /**
                  * Navigation keys
-                 * keys: arrow up, arrow down
+                 * keys: arrow up, arrow down, escape
                  */
-                if(e.keyCode == 38 || e.keyCode ==40) {
+                if(e.keyCode == 38 || e.keyCode ==40 || e.keyCode ==27) {
+                    if(e.keyCode===27){//escape
+                        settings.onEscape(input,list);
+                        settings.onAfterEscape(input,list);
+                        return;
+                    }
                     var current = $(listSelector + ' li.active');
                     if (current.length === 0) {
                         $(listSelector + ' li:first').addClass('active');
@@ -227,10 +248,10 @@
                     $('<ul id="' + listId + '" class="suggest"></ul>').appendTo($(this).parent());
                 }
 
-                var list = $(listSelector);
                 list.html('').show().css({
                     width: $(this).width(),
-                    'margin-left': $(this).css('margin-left')
+                    'margin-left': $(this).css('margin-left'),
+                    'margin-top': '-1px'
                 });
 
                 var handler = function(suggestions){
